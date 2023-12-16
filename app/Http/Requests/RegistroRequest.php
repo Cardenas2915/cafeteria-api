@@ -4,6 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+//se estancia la libreria de password y se renombra a passwordRules
+use Illuminate\Validation\Rules\Password as PasswordRules;
+
 class RegistroRequest extends FormRequest
 {
     /**
@@ -22,8 +25,27 @@ class RegistroRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
-            
+            //se colocan las validacion para registrar usuarios y se mandan al controlador
+            'name' => ['required','string'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => [
+                'required',
+                'confirmed',
+                //*utilizamos la libreria de password y validamos que la libreria tenga minimo 8 caracteres/letras/simbolos y numeros
+                PasswordRules::min(8)->letters()->symbols()->numbers(),
+            ]
+
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'name' => 'El nombre es obligatorio',
+            'email.required' => 'El email es obligatorio',
+            'email.email' => 'El email no es valido',
+            'email.unique' => 'El usuario ya esta registrado',
+            'password' => 'El password debe contener almenos 8 caracteres. un simbolo y un numero'
         ];
     }
 }
